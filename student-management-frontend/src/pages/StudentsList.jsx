@@ -12,13 +12,14 @@ const StudentsList = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('name');
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const response = await studentService.getAllStudents(1, 100, search);
+      const response = await studentService.getAllStudents(1, 100, search, sortBy);
       setStudents(response.data || []);
     } catch (error) {
       toast.error('Failed to fetch students');
@@ -30,9 +31,9 @@ const StudentsList = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       fetchStudents();
-    }, 500);
+    }, 400);
     return () => clearTimeout(delayDebounceFn);
-  }, [search]);
+  }, [search, sortBy]);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -49,100 +50,111 @@ const StudentsList = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto h-full flex flex-col">
-      <div className="flex justify-between items-end mb-6">
+    <div className="max-w-7xl mx-auto h-full flex flex-col space-y-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Students Directory</h1>
-          <p className="text-slate-500 mt-1">Manage all your enrolled students.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Students</h1>
+          <p className="text-slate-500 mt-1">View, add, and manage student records in one place.</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate('/students/add')}
-          className="bg-primary-500 hover:bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-primary-500/30 flex items-center gap-2 transition-colors"
+          className="inline-flex items-center gap-2 rounded-full bg-primary-500 px-5 py-3 text-white shadow-lg shadow-primary-500/20 transition hover:bg-primary-600"
         >
           <Plus size={20} />
           Add Student
         </motion.button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex-1 overflow-hidden flex flex-col">
-        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-          <div className="relative w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search by name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all text-sm"
-            />
-          </div>
+      <div className="grid gap-4 lg:grid-cols-[1fr_auto] items-center bg-white rounded-[1.75rem] border border-slate-200 p-4 shadow-sm">
+        <div className="relative max-w-lg">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-sm text-slate-900 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+          />
         </div>
 
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-4"><TableSkeleton rows={8} /></div>
-          ) : students.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-500 py-12">
-              <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                <Users size={32} className="text-slate-400" />
-              </div>
-              <p className="text-lg font-medium text-slate-700">No students found</p>
-              <p className="text-sm">Try adjusting your search or add a new student.</p>
-            </div>
-          ) : (
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-slate-50 text-slate-500 text-sm font-medium sticky top-0">
-                <tr>
-                  <th className="px-6 py-4 border-b border-slate-100">Name</th>
-                  <th className="px-6 py-4 border-b border-slate-100">Email</th>
-                  <th className="px-6 py-4 border-b border-slate-100 flex items-center gap-2 cursor-pointer hover:text-slate-700">
-                    Course <ArrowUpDown size={14} />
-                  </th>
-                  <th className="px-6 py-4 border-b border-slate-100 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.map((student, index) => (
-                  <motion.tr 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    key={student.id} 
-                    className="hover:bg-slate-50/80 transition-colors group"
-                  >
-                    <td className="px-6 py-4 border-b border-slate-50">
-                      <div className="font-medium text-slate-800">{student.name}</div>
-                    </td>
-                    <td className="px-6 py-4 border-b border-slate-50 text-slate-500">{student.email}</td>
-                    <td className="px-6 py-4 border-b border-slate-50">
-                      <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium border border-slate-200">
-                        {student.course}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 border-b border-slate-50 text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => navigate(`/students/edit/${student.id}`)}
-                          className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button 
-                          onClick={() => setDeleteModal({ isOpen: true, id: student.id })}
-                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600">
+            <ArrowUpDown size={16} /> Sorted by {sortBy}
+          </span>
+          <button
+            onClick={() => setSortBy('name')}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition ${sortBy === 'name' ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+          >
+            Name
+          </button>
+          <button
+            onClick={() => setSortBy('course')}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition ${sortBy === 'course' ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+          >
+            Course
+          </button>
         </div>
+      </div>
+
+      <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">
+        {loading ? (
+          <div className="p-6"><TableSkeleton rows={8} /></div>
+        ) : students.length === 0 ? (
+          <div className="p-12 text-center text-slate-500">
+            <div className="mx-auto mb-4 inline-flex h-24 w-24 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+              <Users size={32} />
+            </div>
+            <p className="text-xl font-semibold text-slate-900">No students match your search</p>
+            <p className="mt-2 text-sm">Try a different keyword or add a new student to get started.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 p-6 lg:p-8">
+            <div className="grid gap-4 lg:grid-cols-[1fr_250px] items-center">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Showing</p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-900">{students.length} students currently active</h2>
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-700">
+                Update or delete students instantly from the list below.
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {students.map((student, index) => (
+                <motion.div
+                  key={student.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex flex-col gap-4 rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-slate-900">{student.name}</p>
+                    <p className="text-sm text-slate-500">{student.email}</p>
+                    <p className="text-sm text-slate-500">Enrolled in <span className="font-medium text-slate-900">{student.course}</span></p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={() => navigate(`/students/edit/${student.id}`)}
+                      className="inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700 transition hover:bg-primary-100"
+                    >
+                      <Edit2 size={16} /> Edit
+                    </button>
+                    <button
+                      onClick={() => setDeleteModal({ isOpen: true, id: student.id })}
+                      className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
+                    >
+                      <Trash2 size={16} /> Remove
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <Modal
@@ -151,7 +163,7 @@ const StudentsList = () => {
         onConfirm={handleDelete}
         isLoading={isDeleting}
         title="Delete Student"
-        message="Are you sure you want to delete this student? This action cannot be undone."
+        message="Are you sure you want to remove this student? This cannot be undone."
       />
     </div>
   );
