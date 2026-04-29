@@ -1,0 +1,12 @@
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/repository/StudentRepository.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/exception/ResourceNotFoundException.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/StudentManagementSystemApplication.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/service/StudentService.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/repository/StudentRepositoryImpl.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/controller/StudentController.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/exception/GlobalExceptionHandler.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/dto/StudentRequest.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/dto/ApiResponse.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/model/Student.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/service/StudentServiceImpl.java
+/Users/kratikaagrawal/Desktop/spring_project/student-management-system/src/main/java/com/example/student/exception/DuplicateResourceException.java
